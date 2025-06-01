@@ -1,0 +1,76 @@
+{
+  "name": "@xyflow/vue",
+  "version": "0.1.0",
+  "description": "Vue Flow - A highly customizable Vue 3 library for building node-based editors, workflow systems, diagrams and more.",
+  "keywords": [
+    "vue",
+    "node-based UI",
+    "graph",
+    "diagram",
+    "workflow",
+    "vue-flow",
+    "xyflow"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xyflow/xyflow.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://vueflow.dev",
+  "bugs": {
+    "url": "https://github.com/xyflow/xyflow/issues"
+  },
+  "scripts": {
+    "dev": "concurrently \"vite build --watch\" \"pnpm css-watch\"",
+    "build": "vite build && pnpm css",
+    "check": "vue-tsc --noEmit",
+    "check:watch": "vue-tsc --noEmit --watch",
+    "css": "postcss src/styles/{base,style}.css --config ./../../tooling/postcss-config --dir dist",
+    "css-watch": "pnpm css --watch",
+    "lint": "prettier --check . && eslint ./src",
+    "format": "prettier --write .",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "type": "module",
+  "main": "./dist/xyflow-vue.umd.js",
+  "module": "./dist/xyflow-vue.es.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/xyflow-vue.es.js",
+      "require": "./dist/xyflow-vue.umd.js"
+    },
+    "./dist/base.css": "./dist/base.css",
+    "./dist/style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@xyflow/system": "workspace:*",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/compiler-sfc": "^3.3.4",
+    "@vue/tsconfig": "^0.4.0",
+    "concurrently": "^7.6.0",
+    "typescript": "5.4.5",
+    "vite": "^4.4.9",
+    "vite-plugin-dts": "^3.5.3",
+    "vue-tsc": "^1.8.8"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  }
+}
+

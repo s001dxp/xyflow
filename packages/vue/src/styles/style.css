@@ -1,0 +1,147 @@
+/* This file contains additional styling options for Vue Flow */
+
+.vue-flow__node {
+  border-radius: 3px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.vue-flow__node.selected,
+.vue-flow__node.selected:hover {
+  box-shadow: 0 0 0 2px #1a192b;
+}
+
+.vue-flow__node-default {
+  background-color: #ffffff;
+  border-color: #1a192b;
+  border-width: 1px;
+  color: #222;
+  border-radius: 3px;
+  padding: 10px;
+  text-align: center;
+  min-width: 150px;
+  font-size: 12px;
+}
+
+.vue-flow__node-input {
+  background-color: #fff;
+  border-color: #0041d0;
+}
+
+.vue-flow__node-output {
+  background-color: #fff;
+  border-color: #ff0072;
+}
+
+.vue-flow__handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: #1a192b;
+  border: 2px solid white;
+  border-radius: 100%;
+  cursor: crosshair;
+}
+
+.vue-flow__handle-top {
+  top: -7px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.vue-flow__handle-right {
+  right: -7px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.vue-flow__handle-bottom {
+  bottom: -7px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.vue-flow__handle-left {
+  left: -7px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.vue-flow__handle.connectable {
+  cursor: crosshair;
+}
+
+.vue-flow__handle.connectng {
+  background: #ff6060;
+}
+
+.vue-flow__handle.connectng.valid {
+  background: #55dd99;
+}
+
+.vue-flow__edge-path {
+  stroke: #b1b1b7;
+  stroke-width: 1;
+}
+
+.vue-flow__edge.selected .vue-flow__edge-path,
+.vue-flow__edge:focus .vue-flow__edge-path,
+.vue-flow__edge:focus-visible .vue-flow__edge-path {
+  stroke: #555;
+}
+
+.vue-flow__edge.animated path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+.vue-flow__edge.updating .vue-flow__edge-path {
+  stroke: #777;
+}
+
+.vue-flow__edge-text {
+  font-size: 10px;
+}
+
+.vue-flow__edge-textbg {
+  fill: white;
+}
+
+.vue-flow__connection-path {
+  stroke: #b1b1b7;
+  stroke-width: 1.5;
+}
+
+.vue-flow__connection.valid path {
+  stroke: #43b883; /* Vue green */
+}
+
+.vue-flow__connection.invalid path {
+  stroke: #ff6060;
+}
+
+.vue-flow__controls {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
+}
+
+.vue-flow__controls-button {
+  background: #fefefe;
+  border-bottom: 1px solid #eee;
+  box-sizing: content-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  user-select: none;
+  padding: 5px;
+}
+
+.vue-flow__controls-button:hover {
+  background: #f4f4f4;
+}
+
+.vue-flow__minimap {
+  background-color: #fff;
+}
