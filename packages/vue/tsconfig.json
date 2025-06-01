@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "declaration": true,
     "jsx": "preserve",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]
     }
@@ -16,4 +17,3 @@
     }
   ]
 }
-
