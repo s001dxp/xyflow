@@ -11,12 +11,12 @@ export function useHandleConnections() {
   const connectingHandleId = computed(() => connectionStartHandle.value?.handleId ?? null);
   const connectingHandleType = computed(() => connectionStartHandle.value?.type ?? null);
 
-  const onConnectStart: OnConnectStart = (event, params) => {
+  const onConnectStart: OnConnectStart = (event: MouseEvent, params: { nodeId: string; handleId: string; type: string }) => {
     isConnecting.value = true;
     connectionStartHandle.value = params;
   };
 
-  const onConnectEnd: OnConnectEnd = (event) => {
+  const onConnectEnd: OnConnectEnd = (event: MouseEvent) => {
     isConnecting.value = false;
     connectionStartHandle.value = null;
   };

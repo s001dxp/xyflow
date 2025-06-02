@@ -5,7 +5,7 @@ import type { Viewport, FitViewOptions } from '@xyflow/system';
 export function useViewport() {
   const store = useVueFlow();
 
-  const viewport = computed(() => store.state.viewport);
+  const viewport = computed(() => store.viewport);
 
   const setViewport = (viewport: Viewport) => {
     store.setViewport(viewport);

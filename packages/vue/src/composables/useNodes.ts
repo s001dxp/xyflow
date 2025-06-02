@@ -5,7 +5,7 @@ import type { Node, NodeChange } from '@xyflow/system';
 export function useNodes() {
   const store = useVueFlow();
 
-  const nodes = computed(() => store.state.nodes);
+  const nodes = computed(() => store.nodes);
   const getNode = (id: string) => store.getNode(id);
   const getNodes = () => store.getNodes();
 
