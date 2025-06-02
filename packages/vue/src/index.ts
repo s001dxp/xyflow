@@ -1,14 +1,14 @@
 import type { App } from 'vue';
 import { createFlowStore } from './store';
-import { VueFlow } from './components/VueFlow';
-import { Background } from './components/Background';
-import { MiniMap } from './components/MiniMap';
-import { Controls } from './components/Controls';
-import { Panel } from './components/Panel';
-import { Handle } from './components/Handle';
-import { EdgeLabelRenderer } from './components/EdgeLabelRenderer';
-import { BezierEdge, StraightEdge, StepEdge, SmoothStepEdge } from './components/Edges';
-import { ConnectionLine } from './components/ConnectionLine';
+import VueFlow from './components/VueFlow.vue';
+import Background from './components/Background.vue';
+import MiniMap from './components/MiniMap.vue';
+import Controls from './components/Controls.vue';
+import Panel from './components/Panel.vue';
+import Handle from './components/Handle.vue';
+import EdgeLabelRenderer from './components/EdgeLabelRenderer.vue';
+import { BezierEdge, StraightEdge, StepEdge, SmoothStepEdge } from './components/edges';
+import ConnectionLine from './components/ConnectionLine.vue';
 
 // Composables (Vue equivalent of React hooks)
 import { useVueFlow } from './composables/useVueFlow';
