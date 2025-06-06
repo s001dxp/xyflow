@@ -24,8 +24,8 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { getBezierPath } from '@xyflow/system';
 import BaseEdge from './BaseEdge.vue';
+import { Position } from '../../types/position';
 
 export default defineComponent({
   name: 'BezierEdge',
@@ -108,19 +108,19 @@ export default defineComponent({
   },
   setup(props) {
     const edgePath = computed(() => {
-      const [path, labelX, labelY] = getBezierPath({
+      const result = getBezierPath({
         sourceX: props.sourceX,
         sourceY: props.sourceY,
-        sourcePosition: props.sourcePosition,
+        sourcePosition: mapStringToPosition(props.sourcePosition),
         targetX: props.targetX,
         targetY: props.targetY,
-        targetPosition: props.targetPosition,
+        targetPosition: mapStringToPosition(props.targetPosition),
       });
 
       return {
-        path,
-        labelX,
-        labelY,
+        path: result[0],
+        labelX: result[1],
+        labelY: result[2],
       };
     });
 
@@ -131,4 +131,63 @@ export default defineComponent({
     };
   }
 });
+
+// Helper function to map string positions to Position enum
+function mapStringToPosition(positionStr: string): Position {
+  switch (positionStr) {
+    case 'top': return Position.Top;
+    case 'bottom': return Position.Bottom;
+    case 'left': return Position.Left;
+    case 'right': return Position.Right;
+    default: return Position.Bottom;
+  }
+}
+
+// Implementation of getBezierPath for Vue package
+function getBezierPath(params: {
+  sourceX: number;
+  sourceY: number;
+  sourcePosition: Position;
+  targetX: number;
+  targetY: number;
+  targetPosition: Position;
+}): [string, number, number] {
+  const { sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition } = params;
+
+  // Determine control points based on positions
+  let sourceControlX = sourceX;
+  let sourceControlY = sourceY;
+  let targetControlX = targetX;
+  let targetControlY = targetY;
+
+  const offset = Math.max(Math.abs(targetX - sourceX), Math.abs(targetY - sourceY)) * 0.5;
+
+  if (sourcePosition === Position.Top) {
+    sourceControlY -= offset;
+  } else if (sourcePosition === Position.Right) {
+    sourceControlX += offset;
+  } else if (sourcePosition === Position.Bottom) {
+    sourceControlY += offset;
+  } else if (sourcePosition === Position.Left) {
+    sourceControlX -= offset;
+  }
+
+  if (targetPosition === Position.Top) {
+    targetControlY -= offset;
+  } else if (targetPosition === Position.Right) {
+    targetControlX += offset;
+  } else if (targetPosition === Position.Bottom) {
+    targetControlY += offset;
+  } else if (targetPosition === Position.Left) {
+    targetControlX -= offset;
+  }
+
+  const path = `M${sourceX},${sourceY} C${sourceControlX},${sourceControlY} ${targetControlX},${targetControlY} ${targetX},${targetY}`;
+
+  // Calculate the mid point for label positioning
+  const labelX = (sourceX + targetX) / 2;
+  const labelY = (sourceY + targetY) / 2;
+
+  return [path, labelX, labelY];
+}
 </script>

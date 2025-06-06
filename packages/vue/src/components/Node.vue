@@ -31,7 +31,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, ref, onMounted } from 'vue';
-import { Node as FlowNode, Position } from '@xyflow/system';
+import { Position } from '../types/position';
+import type { Node as FlowNode } from '../types';
 import { VUE_FLOW_SYMBOL } from '../symbols';
 
 export default defineComponent({
@@ -131,11 +132,13 @@ export default defineComponent({
 
     // Calculate node position
     const position = computed(() => {
-      const [x, y] = props.position;
-      const [originX, originY] = props.nodeOrigin;
+      const posX = props.position.x || 0;
+      const posY = props.position.y || 0;
+      const originX = Number(props.nodeOrigin[0]) || 0;
+      const originY = Number(props.nodeOrigin[1]) || 0;
 
       return {
-        transform: `translate(${x - (props.dimensions.width * originX)}px, ${y - (props.dimensions.height * originY)}px)`,
+        transform: `translate(${posX - (props.dimensions.width * originX)}px, ${posY - (props.dimensions.height * originY)}px)`,
         zIndex: props.zIndex
       };
     });
@@ -146,13 +149,13 @@ export default defineComponent({
       ...props.style,
       visibility: props.isHidden ? 'hidden' : 'visible',
       pointerEvents: props.selectable || props.draggable ? 'all' : 'none'
-    }));
+    } as any)); // Cast to any to avoid StyleValue type issues
 
     const nodeClass = computed(() => props.class);
 
     // Get the appropriate component for this node type
     const nodeComponent = computed(() => {
-      return store?.state.nodeTypes[props.type] || 'div';
+      return store?.nodeTypes?.[props.type] || 'div';
     });
 
     const isConnectable = computed(() => props.connectable);

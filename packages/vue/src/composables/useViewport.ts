@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useVueFlow } from './useVueFlow';
-import type { Viewport, FitViewOptions } from '@xyflow/system';
+import type { Viewport, FitViewOptions } from '../types';
 
 export function useViewport() {
   const store = useVueFlow();

@@ -1,22 +1,36 @@
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useKeyPress as useSystemKeyPress } from '@xyflow/system';
 
 export function useKeyPress(keyCode: string | Array<string>) {
   const pressed = ref(false);
-  let cleanup: (() => void) | undefined;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (Array.isArray(keyCode)) {
+      if (keyCode.includes(event.key)) {
+        pressed.value = true;
+      }
+    } else if (event.key === keyCode) {
+      pressed.value = true;
+    }
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (Array.isArray(keyCode)) {
+      if (keyCode.includes(event.key)) {
+        pressed.value = false;
+      }
+    } else if (event.key === keyCode) {
+      pressed.value = false;
+    }
+  };
 
   onMounted(() => {
-    cleanup = useSystemKeyPress({
-      keyCode,
-      onKeyDown: () => pressed.value = true,
-      onKeyUp: () => pressed.value = false,
-    });
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
   });
 
   onUnmounted(() => {
-    if (cleanup) {
-      cleanup();
-    }
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
   });
 
   return pressed;

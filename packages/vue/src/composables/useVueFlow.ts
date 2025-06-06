@@ -15,32 +15,26 @@ export function useVueFlow() {
   return store;
 }
 
-// Additional type exports for improved DX
+// Re-export types from our local types instead of @xyflow/system
 export type {
-  FlowStore,
   Node,
   Edge,
   Connection,
   ConnectionMode,
-  Position,
   Viewport,
   NodeChange,
   EdgeChange,
   OnConnect,
   OnConnectStart,
   OnConnectEnd,
-  OnNodeDragStart,
-  OnNodeDrag,
-  OnNodeDragStop,
   SelectionMode,
   PanOnScrollMode,
-  KeyCode,
-  NodeMouseHandler,
-  NodeDragHandler,
-  SelectionDragHandler,
-  EdgeMouseHandler,
   ConnectionLineType,
   CoordinateExtent,
   NodeOrigin,
   DefaultEdgeOptions,
-} from '@xyflow/system';
+  FitViewOptions,
+} from '../types';
+
+// Export our store type
+export type { FlowStore } from '../store';

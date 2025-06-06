@@ -5,15 +5,12 @@
     "outDir": "./dist",
     "declaration": true,
     "jsx": "preserve",
+    "module": "esnext",
+    "target": "esnext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "references": [
-    {
-      "path": "../system"
-    }
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

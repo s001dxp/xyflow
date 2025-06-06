@@ -1,6 +1,6 @@
 import { inject } from 'vue';
 import { VUE_FLOW_SYMBOL } from '../symbols';
-import type { Viewport, FitViewOptions, XYPosition } from '@xyflow/system';
+import type { Viewport, FitViewOptions, XYPosition } from '../types';
 
 export function useZoomPanHelper() {
   const store = inject(VUE_FLOW_SYMBOL);

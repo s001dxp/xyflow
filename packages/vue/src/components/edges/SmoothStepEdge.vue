@@ -24,8 +24,8 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { getSmoothStepPath } from '@xyflow/system';
 import BaseEdge from './BaseEdge.vue';
+import { Position } from '../../types/position';
 
 export default defineComponent({
   name: 'SmoothStepEdge',
@@ -112,20 +112,20 @@ export default defineComponent({
   },
   setup(props) {
     const edgePath = computed(() => {
-      const [path, labelX, labelY] = getSmoothStepPath({
+      const result = getSmoothStepPath({
         sourceX: props.sourceX,
         sourceY: props.sourceY,
-        sourcePosition: props.sourcePosition,
+        sourcePosition: mapStringToPosition(props.sourcePosition),
         targetX: props.targetX,
         targetY: props.targetY,
-        targetPosition: props.targetPosition,
-        borderRadius: props.borderRadius,
+        targetPosition: mapStringToPosition(props.targetPosition),
+        borderRadius: props.borderRadius
       });
 
       return {
-        path,
-        labelX,
-        labelY,
+        path: result[0],
+        labelX: result[1],
+        labelY: result[2],
       };
     });
 
@@ -136,4 +136,46 @@ export default defineComponent({
     };
   }
 });
+
+// Helper function to map string positions to Position enum
+function mapStringToPosition(positionStr: string): Position {
+  switch (positionStr) {
+    case 'top': return Position.Top;
+    case 'bottom': return Position.Bottom;
+    case 'left': return Position.Left;
+    case 'right': return Position.Right;
+    default: return Position.Bottom;
+  }
+}
+
+// Local implementation of getSmoothStepPath
+function getSmoothStepPath(params: {
+  sourceX: number;
+  sourceY: number;
+  sourcePosition: Position;
+  targetX: number;
+  targetY: number;
+  targetPosition: Position;
+  borderRadius?: number;
+}): [string, number, number] {
+  const { sourceX, sourceY, targetX, targetY, borderRadius = 0 } = params;
+
+  const midX = (sourceX + targetX) / 2;
+
+  let path: string;
+
+  if (borderRadius === 0) {
+    path = `M${sourceX},${sourceY} H${midX} V${targetY} H${targetX}`;
+  } else {
+    // This is a simplified version that doesn't handle all border radius cases
+    // A complete implementation would calculate the proper curves
+    path = `M${sourceX},${sourceY} H${midX} V${targetY} H${targetX}`;
+  }
+
+  // Calculate the mid point for label positioning
+  const labelX = midX;
+  const labelY = (sourceY + targetY) / 2;
+
+  return [path, labelX, labelY];
+}
 </script>

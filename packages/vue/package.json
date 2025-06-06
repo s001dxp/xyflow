@@ -57,15 +57,22 @@
   },
   "dependencies": {
     "@xyflow/system": "workspace:*",
-    "vue": "^3.3.4"
+    "d3-drag": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "vue": "^3.3.4",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@types/d3-drag": "^3.0.7",
+    "@types/d3-selection": "^3.0.10",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/compiler-sfc": "^3.3.4",
     "@vue/tsconfig": "^0.4.0",
     "concurrently": "^7.6.0",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
     "typescript": "5.4.5",
-    "vite": "6.3.4",
+    "vite": "^4.4.9",
     "vite-plugin-dts": "^3.5.3",
     "vue-tsc": "^1.8.8"
   },
@@ -73,4 +80,3 @@
     "vue": "^3.2.0"
   }
 }
-

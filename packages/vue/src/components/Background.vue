@@ -50,7 +50,7 @@ export default defineComponent({
 
     const backgroundStyle = computed(() => {
       const { gap, size, color, patternColor, style } = props;
-      const zoom = store?.state.viewport.zoom ?? 1;
+      const zoom = store?.viewport.zoom ?? 1;
       const scaledGap = gap * zoom;
       const scaledSize = size * zoom;
 

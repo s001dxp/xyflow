@@ -1,11 +1,11 @@
 import { computed } from 'vue';
 import { useVueFlow } from './useVueFlow';
-import type { Edge, EdgeChange, Connection } from '@xyflow/system';
+import type { Edge, EdgeChange, Connection } from '../types';
 
 export function useEdges() {
   const store = useVueFlow();
 
-  const edges = computed(() => store.state.edges);
+  const edges = computed(() => store.edges);
   const getEdge = (id: string) => store.getEdge(id);
   const getEdges = () => store.getEdges();
 

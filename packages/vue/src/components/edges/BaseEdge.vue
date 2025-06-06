@@ -19,6 +19,14 @@
       :marker-end="markerEnd"
       :marker-start="markerStart"
     />
+    <path
+      v-if="interactionWidth"
+      :d="path"
+      fill="none"
+      :stroke-opacity="0"
+      :stroke-width="interactionWidth"
+      :class="'vue-flow__edge-interaction'"
+    />
     <g
       v-if="label"
       :transform="`translate(${labelX}, ${labelY})`"
@@ -115,6 +123,10 @@ export default defineComponent({
     markerStart: {
       type: String,
       default: undefined
+    },
+    interactionWidth: {
+      type: Number,
+      default: 20
     }
   },
   emits: [

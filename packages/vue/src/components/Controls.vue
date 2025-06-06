@@ -17,15 +17,16 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject } from 'vue';
-import { Position } from '@xyflow/system';
+import { Position } from '../types/position';
 import { VUE_FLOW_SYMBOL } from '../symbols';
 
 export default defineComponent({
   name: 'Controls',
   props: {
     position: {
-      type: String as () => Position,
-      default: Position.BottomLeft
+      type: String,
+      default: Position.BottomLeft,
+      validator: (value: string) => Object.values(Position).includes(value as Position)
     },
     showZoom: {
       type: Boolean,
@@ -52,15 +53,27 @@ export default defineComponent({
     const store = inject(VUE_FLOW_SYMBOL);
 
     const controlsStyle = computed(() => {
-      const position = {
-        [Position.TopLeft]: { left: 10, top: 10 },
-        [Position.TopRight]: { right: 10, top: 10 },
-        [Position.BottomLeft]: { left: 10, bottom: 10 },
-        [Position.BottomRight]: { right: 10, bottom: 10 }
-      }[props.position];
+      let positionStyle = {};
+
+      switch (props.position) {
+        case Position.TopLeft:
+          positionStyle = { left: 10, top: 10 };
+          break;
+        case Position.TopRight:
+          positionStyle = { right: 10, top: 10 };
+          break;
+        case Position.BottomLeft:
+          positionStyle = { left: 10, bottom: 10 };
+          break;
+        case Position.BottomRight:
+          positionStyle = { right: 10, bottom: 10 };
+          break;
+        default:
+          positionStyle = { left: 10, bottom: 10 };
+      }
 
       return {
-        ...position,
+        ...positionStyle,
         ...props.style
       };
     });

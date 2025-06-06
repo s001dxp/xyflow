@@ -80,14 +80,14 @@ export type XYResizerInstance = {
   destroy: () => void;
 };
 
-function nodeToParentExtent(node: NodeBase): CoordinateExtent {
+export function nodeToParentExtent(node: NodeBase): CoordinateExtent {
   return [
     [0, 0],
     [node.measured!.width!, node.measured!.height!],
   ];
 }
 
-function nodeToChildExtent(child: NodeBase, parent: NodeBase, nodeOrigin: NodeOrigin): CoordinateExtent {
+export function nodeToChildExtent(child: NodeBase, parent: NodeBase, nodeOrigin: NodeOrigin): CoordinateExtent {
   const x = parent.position.x + child.position.x;
   const y = parent.position.y + child.position.y;
   const width = child.measured!.width! ?? 0;

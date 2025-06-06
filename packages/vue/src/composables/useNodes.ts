@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useVueFlow } from './useVueFlow';
-import type { Node, NodeChange } from '@xyflow/system';
+import type { Node, NodeChange } from '../types';
 
 export function useNodes() {
   const store = useVueFlow();

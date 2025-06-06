@@ -31,17 +31,17 @@
           :style="node.style"
           :class="node.class"
           :selected="node.selected"
-          :draggable="!node.draggable ? nodeDraggable : node.draggable"
-          :selectable="!node.selectable ? nodeSelectable : node.selectable"
-          :connectable="!node.connectable ? nodeConnectable : node.connectable"
-          :deletable="!node.deletable ? nodeDeletable : node.deletable"
+          :draggable="!node.draggable ? nodesDraggable : node.draggable"
+          :selectable="!node.selectable ? nodesSelectable : node.selectable"
+          :connectable="!node.connectable ? nodesConnectable : node.connectable"
+          :deletable="!node.deletable ? nodesDeletable : node.deletable"
           :dimensions="getNodeDimensions(node)"
           :z-index="node.zIndex || 0"
           :is-hidden="!!node.hidden"
           :node-origin="nodeOrigin"
           :node-extent="nodeExtent"
           :drag-handle="nodeDragHandle"
-          :parent-node="node.parentNode"
+          :parent-node="node.parentId || node.parentNode"
           :expand-parent="node.expandParent"
           @node-drag-start="onNodeDragStart"
           @node-drag="onNodeDrag"
@@ -79,8 +79,8 @@
             :source-y="getSourcePosition(edge).y"
             :target-x="getTargetPosition(edge).x"
             :target-y="getTargetPosition(edge).y"
-            :source-position="getSourcePosition(edge)"
-            :target-position="getTargetPosition(edge)"
+            :source-position="getSourcePosition(edge).position"
+            :target-position="getTargetPosition(edge).position"
             @edge-click="onEdgeClick"
             @edge-context-menu="onEdgeContextMenu"
             @edge-mouse-enter="onEdgeMouseEnter"
@@ -95,8 +95,8 @@
 
       <ConnectionLine
         v-if="connectionLineVisible"
-        :source-node="connectionLineSourceNode"
-        :source-handle="connectionLineSourceHandle"
+        :source-node="connectionLineSourceNode || {}"
+        :source-handle="connectionLineSourceHandle || undefined"
         :source-x="connectionLineSourceX"
         :source-y="connectionLineSourceY"
         :target-x="connectionLineTargetX"
@@ -119,26 +119,13 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import {
-  ConnectionMode,
-  SelectionMode,
-  ConnectionLineType,
-  NodeOrigin,
-  PanOnScrollMode,
-  Edge,
-  Node,
-  Viewport,
-  Position,
-  applyNodeChanges,
-  applyEdgeChanges,
-  XYPosition,
-  isEdge,
-  CoordinateExtent
-} from '@xyflow/system';
-import { createFlowStore, FlowStore } from '../store';
+import { ConnectionLineType, SelectionMode, PanOnScrollMode } from '@xyflow/system';
+import { createFlowStore } from '../store';
 import Node from './Node.vue';
 import ConnectionLine from './ConnectionLine.vue';
 import { VUE_FLOW_SYMBOL } from '../symbols';
+import { Position } from '../types/position';
+import type { Edge, Node as FlowNode, Viewport, CoordinateExtent, ConnectionMode } from '../types';
 
 export default defineComponent({
   name: 'VueFlow',
@@ -152,7 +139,7 @@ export default defineComponent({
       default: 'vue-flow-' + Math.random().toString(36).substr(2, 5)
     },
     nodes: {
-      type: Array as () => Node[],
+      type: Array as () => FlowNode[],
       default: () => []
     },
     edges: {
@@ -185,7 +172,7 @@ export default defineComponent({
     },
     connectionMode: {
       type: String as () => ConnectionMode,
-      default: ConnectionMode.Strict
+      default: 'strict'
     },
     connectionLineType: {
       type: String as () => ConnectionLineType,
@@ -204,7 +191,7 @@ export default defineComponent({
       default: false
     },
     snapGrid: {
-      type: Array as () => [number, number],
+      type: Array as unknown as () => [number, number],
       default: () => [15, 15]
     },
     panOnScroll: {
@@ -284,15 +271,15 @@ export default defineComponent({
       default: true
     },
     attributionPosition: {
-      type: String as () => Position,
+      type: String,
       default: Position.BottomRight
     },
     nodeExtent: {
-      type: Array as () => CoordinateExtent,
+      type: Array as unknown as () => CoordinateExtent,
       default: undefined
     },
     nodeOrigin: {
-      type: Array as () => [number, number],
+      type: Array as unknown as () => [number, number],
       default: () => [0, 0]
     },
     nodeDragHandle: {
@@ -324,12 +311,12 @@ export default defineComponent({
       defaultNodeTypes: props.nodeTypes,
       defaultEdgeTypes: props.edgeTypes,
       defaultEdgeOptions: props.defaultEdgeOptions,
-      connectionMode: props.connectionMode
+      connectionMode: props.connectionMode as any
     });
 
     // Connection line state
     const connectionLineVisible = ref(false);
-    const connectionLineSourceNode = ref<Node | null>(null);
+    const connectionLineSourceNode = ref<FlowNode | null>(null);
     const connectionLineSourceHandle = ref<string | null>(null);
     const connectionLineSourceX = ref(0);
     const connectionLineSourceY = ref(0);
@@ -341,7 +328,7 @@ export default defineComponent({
 
     // Computed styles for viewport
     const viewportStyle = computed(() => {
-      const { x, y, zoom } = store.state.viewport;
+      const { x, y, zoom } = store.viewport;
       return {
         transform: `translate(${x}px, ${y}px) scale(${zoom})`,
       };
@@ -440,7 +427,7 @@ export default defineComponent({
     };
 
     // Helper functions
-    const getNodeDimensions = (node: Node) => {
+    const getNodeDimensions = (node: FlowNode) => {
       // Get node dimensions
       return { width: 0, height: 0 };
     };
@@ -456,12 +443,22 @@ export default defineComponent({
 
     const getSourcePosition = (edge: Edge) => {
       // Calculate source position for the edge
-      return { x: 0, y: 0 };
+      const node = store.getNode(edge.source);
+      return {
+        x: node?.position?.x || 0,
+        y: node?.position?.y || 0,
+        position: node?.sourcePosition || 'bottom'
+      };
     };
 
     const getTargetPosition = (edge: Edge) => {
       // Calculate target position for the edge
-      return { x: 0, y: 0 };
+      const node = store.getNode(edge.target);
+      return {
+        x: node?.position?.x || 0,
+        y: node?.position?.y || 0,
+        position: node?.targetPosition || 'top'
+      };
     };
 
     // Provide the store to child components
@@ -488,6 +485,7 @@ export default defineComponent({
     });
 
     return {
+      ...store,
       flowWrapper,
       panningOrSelecting,
       viewportStyle,
@@ -528,8 +526,6 @@ export default defineComponent({
       getNode,
       getSourcePosition,
       getTargetPosition,
-      ...store,
-      store: store.state,
       SelectionMode,
     };
   }

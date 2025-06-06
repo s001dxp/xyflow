@@ -1,22 +1,28 @@
 import { computed, ref } from 'vue';
 import { useVueFlow } from './useVueFlow';
-import type { Connection, OnConnectStart, OnConnectEnd } from '@xyflow/system';
+import type { Connection } from '../types';
+
+export interface ConnectionStartParams {
+  nodeId: string;
+  handleId: string;
+  type: string;
+}
 
 export function useHandleConnections() {
   const store = useVueFlow();
   const isConnecting = ref(false);
-  const connectionStartHandle = ref<ReturnType<OnConnectStart> | null>(null);
+  const connectionStartHandle = ref<ConnectionStartParams | null>(null);
 
   const connectingNodeId = computed(() => connectionStartHandle.value?.nodeId ?? null);
   const connectingHandleId = computed(() => connectionStartHandle.value?.handleId ?? null);
   const connectingHandleType = computed(() => connectionStartHandle.value?.type ?? null);
 
-  const onConnectStart: OnConnectStart = (event: MouseEvent, params: { nodeId: string; handleId: string; type: string }) => {
+  const onConnectStart = (event: MouseEvent | TouchEvent, params: ConnectionStartParams) => {
     isConnecting.value = true;
     connectionStartHandle.value = params;
   };
 
-  const onConnectEnd: OnConnectEnd = (event: MouseEvent) => {
+  const onConnectEnd = (event: MouseEvent | TouchEvent) => {
     isConnecting.value = false;
     connectionStartHandle.value = null;
   };

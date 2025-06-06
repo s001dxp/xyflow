@@ -26,14 +26,15 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, ref } from 'vue';
-import { Node, Position } from '@xyflow/system';
+import { Position } from '../types/position';
 import { VUE_FLOW_SYMBOL } from '../symbols';
+import type { Node } from '../types';
 
 export default defineComponent({
   name: 'MiniMap',
   props: {
     position: {
-      type: String as () => Position,
+      type: String,
       default: Position.BottomRight,
       validator: (value: string) => Object.values(Position).includes(value as Position)
     },
@@ -84,17 +85,29 @@ export default defineComponent({
     const transform = ref({ x: 0, y: 0, zoom: 1 });
 
     const minimapStyle = computed(() => {
-      const position = {
-        [Position.TopLeft]: { top: 10, left: 10 },
-        [Position.TopRight]: { top: 10, right: 10 },
-        [Position.BottomLeft]: { bottom: 10, left: 10 },
-        [Position.BottomRight]: { bottom: 10, right: 10 }
-      }[props.position];
+      let positionStyle = {};
+
+      switch (props.position) {
+        case Position.TopLeft:
+          positionStyle = { top: 10, left: 10 };
+          break;
+        case Position.TopRight:
+          positionStyle = { top: 10, right: 10 };
+          break;
+        case Position.BottomLeft:
+          positionStyle = { bottom: 10, left: 10 };
+          break;
+        case Position.BottomRight:
+          positionStyle = { bottom: 10, right: 10 };
+          break;
+        default:
+          positionStyle = { bottom: 10, right: 10 };
+      }
 
       return {
         width: `${props.width}px`,
         height: `${props.height}px`,
-        ...position,
+        ...positionStyle,
         ...props.style
       };
     });
@@ -103,7 +116,10 @@ export default defineComponent({
       backgroundColor: props.maskColor
     }));
 
-    const nodes = computed(() => store?.state.nodes || []);
+    const nodes = computed(() => {
+      // Access nodes from the store, but be safe about it
+      return (store && 'nodes' in store) ? store.nodes : [];
+    });
 
     const getNodeComponent = (node: Node) => {
       return 'rect';
