@@ -55,15 +55,21 @@ const nodeSelector = computed(() => (s: FlowStore) => {
   }
 
   const node = nodeInternals.internals.userNode as Node;
-  const { x, y } = nodeInternals.internals.positionAbsolute;
-  const { width, height } = getNodeDimensions(node);
+  const { x: rawX, y: rawY } = nodeInternals.internals.positionAbsolute;
+  const { width: rawWidth, height: rawHeight } = getNodeDimensions(node);
+
+  // Ensure all values are finite numbers
+  const safeX = isFinite(rawX) ? rawX : 0;
+  const safeY = isFinite(rawY) ? rawY : 0;
+  const safeWidth = isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 1;
+  const safeHeight = isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 1;
 
   return {
     node,
-    x,
-    y,
-    width,
-    height,
+    x: safeX,
+    y: safeY,
+    width: safeWidth,
+    height: safeHeight,
   };
 });
 

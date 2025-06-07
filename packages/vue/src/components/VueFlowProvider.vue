@@ -33,8 +33,3 @@ const store = createFlowStore({
 provide(VUE_FLOW_SYMBOL, store);
 </script>
 
-<script lang="ts">
-export default {
-  name: 'VueFlowProvider'
-};
-</script>

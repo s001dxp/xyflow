@@ -71,15 +71,15 @@
 import { inject, computed } from 'vue';
 import { VUE_FLOW_SYMBOL } from '../../symbols';
 import Panel from '../../components/Panel.vue';
-import type { PanelPosition, FitViewOptions } from '../../types';
+import type { FitViewOptions } from '../../types';
 import type { CSSProperties } from 'vue';
 
-interface ControlsProps {
+export interface ControlsProps {
   showZoom?: boolean;
   showFitView?: boolean;
   showInteractive?: boolean;
   fitViewOptions?: FitViewOptions;
-  position?: PanelPosition;
+  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
   class?: string;
   style?: CSSProperties;
   onZoomIn?: () => void;
@@ -132,8 +132,4 @@ const onToggleInteractivity = () => {
 };
 </script>
 
-<script lang="ts">
-export default {
-  name: 'Controls'
-};
-</script>
+

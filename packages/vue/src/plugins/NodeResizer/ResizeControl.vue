@@ -65,10 +65,10 @@ const node = useStore(nodeSelector.value);
 
 // Computed styles
 const controlStyle = computed(() => {
-  if (!node.value) return {};
+  if (!node) return {};
   
-  const { x, y } = node.value.internals.positionAbsolute;
-  const { width, height } = getNodeDimensions(node.value.internals.userNode);
+  const { x, y } = node.internals.positionAbsolute;
+  const { width, height } = getNodeDimensions(node.internals.userNode);
   
   const baseStyle: any = {
     position: 'absolute',
@@ -145,17 +145,18 @@ const controlStyle = computed(() => {
 
 // D3 drag setup
 onMounted(() => {
-  if (!resizeControlRef.value || !node.value) return;
+  if (!resizeControlRef.value || !node) return;
 
   const selection = select(resizeControlRef.value);
   
   const dragHandler = drag()
     .on('start', (event) => {
       const startParams = {
-        x: node.value!.internals.positionAbsolute.x,
-        y: node.value!.internals.positionAbsolute.y,
-        width: node.value!.measured.width || 0,
-        height: node.value!.measured.height || 0,
+        x: node.internals.positionAbsolute.x,
+        y: node.internals.positionAbsolute.y,
+        width: node.measured.width || 0,
+        height: node.measured.height || 0,
+        direction: getDirection(props.position),
       };
       
       if (props.shouldResize && !props.shouldResize(event, startParams)) {
@@ -165,10 +166,10 @@ onMounted(() => {
       emit('resizeStart', event, startParams);
     })
     .on('drag', (event) => {
-      if (!node.value) return;
+      if (!node) return;
       
-      const { x: nodeX, y: nodeY } = node.value.internals.positionAbsolute;
-      const { width: nodeWidth, height: nodeHeight } = getNodeDimensions(node.value.internals.userNode);
+      const { x: nodeX, y: nodeY } = node.internals.positionAbsolute;
+      const { width: nodeWidth, height: nodeHeight } = getNodeDimensions(node.internals.userNode);
       
       let newWidth = nodeWidth;
       let newHeight = nodeHeight;
@@ -239,28 +240,28 @@ onMounted(() => {
       
       // Update node
       const nodeUpdate = {
-        id: node.value.id,
+        id: node.id,
         position: { x: newX, y: newY },
         width: newWidth,
         height: newHeight,
       };
       
-      store.getState().updateNodeData(node.value.id, nodeUpdate);
+      store.getState().updateNodeData(node.id, nodeUpdate);
       
       emit('resize', event, params);
     })
     .on('end', (event) => {
       const endParams = {
-        x: node.value!.internals.positionAbsolute.x,
-        y: node.value!.internals.positionAbsolute.y,
-        width: node.value!.measured.width || 0,
-        height: node.value!.measured.height || 0,
+        x: node.internals.positionAbsolute.x,
+        y: node.internals.positionAbsolute.y,
+        width: node.measured.width || 0,
+        height: node.measured.height || 0,
       };
       
       emit('resizeEnd', event, endParams);
     });
 
-  selection.call(dragHandler);
+  selection.call(dragHandler as any);
 });
 
 // Helper functions

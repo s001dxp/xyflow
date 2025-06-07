@@ -46,11 +46,4 @@ const edgePath = computed(() => {
 });
 </script>
 
-<script lang="ts">
-export default {
-  name: 'SimpleBezierEdge'
-};
 
-// Export utility function
-export { getBezierPath as getSimpleBezierPath } from '@xyflow/system';
-</script>

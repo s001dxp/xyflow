@@ -1,6 +1,7 @@
 <template>
   <div class="basic-flow-example">
     <VueFlow
+      ref="vueFlowRef"
       v-model:nodes="nodes"
       v-model:edges="edges"
       @connect="onConnect"
@@ -26,19 +27,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import {
   VueFlow,
   Background,
   Controls,
   MiniMap,
   Panel,
-  useVueFlow,
-  NodeChange,
-  EdgeChange,
-  Connection,
-  Node,
-  Edge
+  type NodeChange,
+  type EdgeChange,
+  type Connection,
+  type Node,
+  type Edge
 } from '@xyflow/vue';
 import '@xyflow/vue/dist/base.css';
 import '@xyflow/vue/dist/style.css';
@@ -80,7 +80,7 @@ const edges = ref<Edge[]>([
 ]);
 
 // Get flow instance for utilities
-const { fitView } = useVueFlow();
+const vueFlowRef = ref();
 
 // Connect nodes when user creates connections
 const onConnect = (connection: Connection) => {
@@ -143,9 +143,9 @@ const resetFlow = () => {
 
 // Fit view to flow elements on component mount
 onMounted(() => {
-  setTimeout(() => {
-    fitView();
-  }, 0);
+  nextTick(() => {
+    vueFlowRef.value?.fitView();
+  });
 });
 </script>
 

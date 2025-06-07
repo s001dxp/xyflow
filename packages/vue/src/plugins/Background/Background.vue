@@ -104,8 +104,4 @@ const bgStyle = computed<StyleValue>(() => ({
 }));
 </script>
 
-<script lang="ts">
-export default {
-  name: 'Background'
-};
-</script>
+

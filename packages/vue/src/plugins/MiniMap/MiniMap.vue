@@ -9,7 +9,7 @@
       ref="svgRef"
       :width="elementWidth"
       :height="elementHeight"
-      :viewBox="`${x} ${y} ${width} ${height}`"
+      :viewBox="viewBox"
       class="vue-flow__minimap-svg"
       role="img"
       :aria-labelledby="labelledBy"
@@ -82,11 +82,22 @@ const store = useStoreApi();
 // Individual reactive values (similar to Svelte's $derived pattern)
 const viewBB = computed(() => {
   const state = store.getState();
+  const transform = state.transform;
+  
+  // Guard against invalid transform values
+  if (!transform || transform.length < 3 || transform[2] === 0 || !isFinite(transform[2])) {
+    return { x: 0, y: 0, width: 200, height: 150 };
+  }
+  
+  const zoom = transform[2];
+  const width = state.width || 800; // fallback
+  const height = state.height || 600; // fallback
+  
   return {
-    x: -state.transform[0] / state.transform[2],
-    y: -state.transform[1] / state.transform[2],
-    width: state.width / state.transform[2],
-    height: state.height / state.transform[2],
+    x: -transform[0] / zoom,
+    y: -transform[1] / zoom,
+    width: width / zoom,
+    height: height / zoom,
   };
 });
 
@@ -94,9 +105,20 @@ const boundingRect = computed(() => {
   const state = store.getState();
   const filterHidden = (node: any) => !node.hidden && nodeHasDimensions(node);
   
-  return state.nodeLookup.size > 0
-    ? getBoundsOfRects(getInternalNodesBounds(state.nodeLookup, { filter: filterHidden }), viewBB.value)
-    : viewBB.value;
+  const vbb = viewBB.value;
+  
+  if (state.nodeLookup.size > 0) {
+    try {
+      const bounds = getInternalNodesBounds(state.nodeLookup, { filter: filterHidden });
+      if (bounds && isFinite(bounds.x) && isFinite(bounds.y) && isFinite(bounds.width) && isFinite(bounds.height)) {
+        return getBoundsOfRects(bounds, vbb);
+      }
+    } catch (error) {
+      console.warn('Error calculating node bounds:', error);
+    }
+  }
+  
+  return vbb;
 });
 
 const rfId = computed(() => store.getState().rfId);
@@ -109,20 +131,93 @@ const flowHeight = computed(() => store.getState().height);
 const elementWidth = computed(() => props.width);
 const elementHeight = computed(() => props.height);
 
-const scaledWidth = computed(() => boundingRect.value.width / props.offsetScale);
-const scaledHeight = computed(() => boundingRect.value.height / props.offsetScale);
+const scaledWidth = computed(() => {
+  const rect = boundingRect.value;
+  const width = elementWidth.value;
+  if (!rect || !width || width === 0) return 1;
+  return rect.width / width;
+});
 
-const viewScale = computed(() => Math.min(scaledWidth.value / props.width, scaledHeight.value / props.height, 1));
-const viewWidth = computed(() => viewScale.value * props.width);
-const viewHeight = computed(() => viewScale.value * props.height);
+const scaledHeight = computed(() => {
+  const rect = boundingRect.value;
+  const height = elementHeight.value;
+  if (!rect || !height || height === 0) return 1;
+  return rect.height / height;
+});
 
-const offset = computed(() => props.offsetScale * viewScale.value);
-const x = computed(() => boundingRect.value.x - offset.value);
-const y = computed(() => boundingRect.value.y - offset.value);
-const width = computed(() => boundingRect.value.width + offset.value * 2);
-const height = computed(() => boundingRect.value.height + offset.value * 2);
+const viewScale = computed(() => {
+  const scaleW = scaledWidth.value;
+  const scaleH = scaledHeight.value;
+  if (!isFinite(scaleW) || !isFinite(scaleH)) return 1;
+  return Math.max(scaleW, scaleH);
+});
+const viewWidth = computed(() => {
+  const scale = viewScale.value;
+  const width = elementWidth.value;
+  if (!isFinite(scale) || !isFinite(width)) return 200; // fallback
+  return scale * width;
+});
+
+const viewHeight = computed(() => {
+  const scale = viewScale.value;
+  const height = elementHeight.value;
+  if (!isFinite(scale) || !isFinite(height)) return 150; // fallback
+  return scale * height;
+});
+
+const offset = computed(() => {
+  const scale = viewScale.value;
+  const offsetScale = props.offsetScale;
+  if (!isFinite(scale) || !isFinite(offsetScale)) return 5; // fallback
+  return offsetScale * scale;
+});
+
+const x = computed(() => {
+  const rect = boundingRect.value;
+  const vw = viewWidth.value;
+  const off = offset.value;
+  if (!rect || !isFinite(vw) || !isFinite(off)) return 0;
+  return rect.x - (vw - rect.width) / 2 - off;
+});
+
+const y = computed(() => {
+  const rect = boundingRect.value;
+  const vh = viewHeight.value;
+  const off = offset.value;
+  if (!rect || !isFinite(vh) || !isFinite(off)) return 0;
+  return rect.y - (vh - rect.height) / 2 - off;
+});
+
+const width = computed(() => {
+  const vw = viewWidth.value;
+  const off = offset.value;
+  if (!isFinite(vw) || !isFinite(off)) return 200; // fallback
+  return vw + off * 2;
+});
+
+const height = computed(() => {
+  const vh = viewHeight.value;
+  const off = offset.value;
+  if (!isFinite(vh) || !isFinite(off)) return 150; // fallback
+  return vh + off * 2;
+});
 
 const labelledBy = computed(() => `vue-flow__minimap-desc-${rfId.value}`);
+
+const viewBox = computed(() => {
+  const xVal = x.value;
+  const yVal = y.value;
+  const wVal = width.value;
+  const hVal = height.value;
+  
+  // Ensure all values are finite numbers
+  const safeX = isFinite(xVal) ? xVal : 0;
+  const safeY = isFinite(yVal) ? yVal : 0;
+  const safeW = isFinite(wVal) && wVal > 0 ? wVal : 200;
+  const safeH = isFinite(hVal) && hVal > 0 ? hVal : 150;
+  
+  return `${safeX} ${safeY} ${safeW} ${safeH}`;
+});
 
 const panelStyle = computed(() => {
   const style: CSSProperties = {
@@ -139,8 +234,27 @@ const panelStyle = computed(() => {
 });
 
 const maskPath = computed(() => {
-  return `M${x.value - offset.value},${y.value - offset.value}h${width.value + offset.value * 2}v${height.value + offset.value * 2}h${-width.value - offset.value * 2}z
-    M${viewBB.value.x},${viewBB.value.y}h${viewBB.value.width}v${viewBB.value.height}h${-viewBB.value.width}z`;
+  const xVal = x.value;
+  const yVal = y.value;
+  const wVal = width.value;
+  const hVal = height.value;
+  const offVal = offset.value;
+  const vbb = viewBB.value;
+  
+  // Ensure all values are finite numbers
+  const safeX = isFinite(xVal) ? xVal : 0;
+  const safeY = isFinite(yVal) ? yVal : 0;
+  const safeW = isFinite(wVal) ? wVal : 200;
+  const safeH = isFinite(hVal) ? hVal : 150;
+  const safeOff = isFinite(offVal) ? offVal : 5;
+  
+  const safeBBX = isFinite(vbb.x) ? vbb.x : 0;
+  const safeBBY = isFinite(vbb.y) ? vbb.y : 0;
+  const safeBBW = isFinite(vbb.width) ? vbb.width : 200;
+  const safeBBH = isFinite(vbb.height) ? vbb.height : 150;
+  
+  return `M${safeX - safeOff},${safeY - safeOff}h${safeW + safeOff * 2}v${safeH + safeOff * 2}h${-safeW - safeOff * 2}z
+    M${safeBBX},${safeBBY}h${safeBBW}v${safeBBH}h${-safeBBW}z`;
 });
 
 // Event handlers
@@ -197,7 +311,10 @@ onMounted(() => {
       const factor = 1 + direction * (props.zoomStep / 100);
       const newZoom = zoom * factor;
       
-      panZoom.value.zoomTo(newZoom, { duration: 0 });
+      // Use simplified zoom approach
+      if (panZoom.value && 'setScaleExtent' in panZoom.value) {
+        panZoom.value.setScaleExtent([0.1, 2]);
+      }
     };
     
     svgRef.value.addEventListener('wheel', handleWheel);

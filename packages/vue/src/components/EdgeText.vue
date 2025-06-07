@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { StyleValue } from 'vue';
 
 interface EdgeTextProps {
@@ -32,10 +33,4 @@ const style = computed<StyleValue>(() => ({
 }));
 </script>
 
-<script lang="ts">
-import { computed } from 'vue';
 
-export default {
-  name: 'EdgeText'
-};
-</script>

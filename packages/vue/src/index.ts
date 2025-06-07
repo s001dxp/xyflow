@@ -6,13 +6,15 @@ export { default as Handle } from './components/Handle.vue';
 export { default as Panel } from './components/Panel.vue';
 export { default as EdgeLabelRenderer } from './components/EdgeLabelRenderer.vue';
 export { default as ViewportPortal } from './components/ViewportPortal.vue';
+export { default as Node } from './components/Node.vue';
+export { default as ConnectionLine } from './components/ConnectionLine.vue';
 
 // Edge components
 export { default as EdgeText } from './components/EdgeText.vue';
 export { default as StraightEdge } from './components/edges/StraightEdge.vue';
 export { default as StepEdge } from './components/edges/StepEdge.vue';
 export { default as BezierEdge } from './components/edges/BezierEdge.vue';
-export { default as SimpleBezierEdge, getSimpleBezierPath } from './components/edges/SimpleBezierEdge.vue';
+export { default as SimpleBezierEdge } from './components/edges/SimpleBezierEdge.vue';
 export { default as SmoothStepEdge } from './components/edges/SmoothStepEdge.vue';
 export { default as BaseEdge } from './components/edges/BaseEdge.vue';
 
@@ -143,3 +145,6 @@ export {
   reconnectEdge,
   getConnectedEdges,
 } from '@xyflow/system';
+
+// Component prop types for better TypeScript support
+export * from './types/component-props';
